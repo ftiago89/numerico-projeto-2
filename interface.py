@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-METODOS DE HALLEY E RIDDERS PARA CALCULO DE RAIZES DE FUNCOES
+METODOS DE SPLINES PARA INTERPOLACAO POLINOMIAL
 """
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication
@@ -45,37 +45,27 @@ class MyApp(QMainWindow):
         for x in [x / S1 for x in range(int(Xfinal[0] / S), int(Xfinal[-1] / S) + 1)]:
             resultado.append(splines.interpolate(x))
             resultadoDeX.append(x)
-            #self.ui.textEditResultado.setText("Testando na interface")
         
-        #resultadoFinal = "" #essa variável quarda os valores computados pra Y interpolados
-       # Xinterpolados = "" #converte os pontos X interpolados em string
         SaidaDosPontos = ""
         for i in range(0, len(resultado)):  
-            #resultadoFinal += (str)(resultado[i]) + "\n"
-            #Xinterpolados += (str)(resultadoDeX[i]) + "\n"
-            SaidaDosPontos += "(" + (str)(resultadoDeX[i]) + ",  " + (str)(resultado[i]) + ")\n"
-            self.ui.textEditResultado.setText(SaidaDosPontos)
+            SaidaDosPontos += "P(" + (str)(resultadoDeX[i]) + ") = " + (str)(resultado[i]) + "\n"
+        self.ui.textEditResultado.setText(SaidaDosPontos)
         
     
-        #print(SaidaDosPontos)
-        self.desenhaSplines(resultadoDeX, resultado)
+        self.desenhaSplines(resultadoDeX, resultado, Xfinal, Yfinal)
      
     #funcao para desenhar o grafico na interface
-    def desenhaSplines(self, xinterpolados, yinterpolados):
+    def desenhaSplines(self, xinterpolados, yinterpolados, xFinal, fxFinal):
+        
         
         self.ui.MplWidgetSplines.canvas.axes.clear()
         self.ui.MplWidgetSplines.canvas.axes.axhline(y=0, color='r')
-        self.ui.MplWidgetSplines.canvas.axes.plot(xinterpolados, yinterpolados, label='f(x)')
+        self.ui.MplWidgetSplines.canvas.axes.plot(xinterpolados, yinterpolados, label='P(x)')
+        self.ui.MplWidgetSplines.canvas.axes.plot(xFinal, fxFinal, 'ro', label='(x , f(x))')
         self.ui.MplWidgetSplines.canvas.axes.legend()
         self.ui.MplWidgetSplines.canvas.axes.grid()
         self.ui.MplWidgetSplines.canvas.draw()
         
-        #plt.title("3-D Spline Interpolation")
-        #plt.plot(xinterpolados, yinterpolados)
-        #plt.grid(True)
-        #plt.xlabel("X interpolados")
-        #plt.ylabel("Y interpolados")
-        #plt.show()
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
