@@ -1,16 +1,12 @@
 #! /usr/local/bin/python3.6
 """
-3-D spline interpolation
-(with graph drawing by matplotlib)
+Implementacao do metodo de splines cubicos
 """
-import matplotlib.pyplot as plt
-import traceback
-
 class SplineInterpolation:
     def __init__(self, xs, ys):
-        """ Initialization
-        :param list xs: x-coordinate list of given points
-        :param list ys: y-coordinate list of given points
+        """ initicalizacao
+        :lista xs: lista dos x de entrada
+        :lista ys: lista dos y de entrada
         """
         self.xs, self.ys = xs, ys
         self.n = len(self.xs) - 1
@@ -24,22 +20,23 @@ class SplineInterpolation:
         self.c = self.__calc_c(v)
 
     def interpolate(self, t):
-        """ Interpolation
-        :param  float t: x-value for a interpolate target
-        :return float  : computated y-value
+        """ Interpolacao
+        :float t: valor pra ser interpolado
+        :return resultado  : resultado computado
         """
         try:
             i = self.__search_i(t)
-            return self.a[i] * (t - self.xs[i]) ** 3 \
+            resultado = self.a[i] * (t - self.xs[i]) ** 3 \
                  + self.b[i] * (t - self.xs[i]) ** 2 \
                  + self.c[i] * (t - self.xs[i]) \
                  + self.d[i]
+            return resultado
         except Exception as e:
             raise
 
     def __calc_h(self):
-        """ H calculation
-        :return list: h-values
+        """ calculo de H
+        :return lista: valores de h
         """
         try:
             return [self.xs[i + 1] - self.xs[i] for i in range(self.n)]
@@ -47,9 +44,9 @@ class SplineInterpolation:
             raise
 
     def __calc_w(self, h):
-        """ W calculation
-        :param  list h: h-values
-        :return list  : w-values
+        """ calculo de W
+        :lista h: valores de h
+        :return lista  : valores de w
         """
         try:
             return [
@@ -61,10 +58,10 @@ class SplineInterpolation:
             raise
 
     def __gen_matrix(self, h, w):
-        """ Matrix generation
-        :param  list   h: h-values
-        :param  list   w: w-values
-        :return list mtx: generated 2-D matrix
+        """ geracao da matriz
+        :lista   h: valores de h
+        :lista   w: valores de w
+        :return lista mtx: matriz 2-D gerada
         """
         mtx = [[0 for _ in range(self.n)] for _ in range(self.n - 1)]
         try:
@@ -80,10 +77,10 @@ class SplineInterpolation:
             raise
 
     def __gauss_jordan(self, matrix):
-        """ Solving of simultaneous linear equations
-            with Gauss-Jordan's method
-        :param  list mtx: list of 2-D matrix
-        :return list   v: answers list of simultaneous linear equations
+        """ Resolve as equacoes lineares
+            com o metodo de Gauss Jordan
+        :lista mtx: matriz gerada
+        :return lista   v: lista de respostas das equacoes lineares
         """
         v = []
         n = self.n - 1
@@ -105,9 +102,9 @@ class SplineInterpolation:
             raise
 
     def __calc_a(self, v):
-        """ A calculation
-        :param  list v: v-values
-        :return list  : a-values
+        """ calculo de a
+        :lista v: valores de v
+        :return lista  : valores de a
         """
         try:
             return [
@@ -119,9 +116,9 @@ class SplineInterpolation:
             raise
 
     def __calc_b(self, v):
-        """ B calculation
-        :param  list v: v-values
-        :return list  : b-values
+        """ calculo de b
+        :lista v: valores de v
+        :return lista  : valores de b
         """
         try:
             return [v[i] / 2.0 for i in range(self.n)]
@@ -129,9 +126,9 @@ class SplineInterpolation:
             raise
 
     def __calc_c(self, v):
-        """ C calculation
-        :param  list v: v-values
-        :return list  : c-values
+        """ calculo de c
+        :lista v: valores de v
+        :return lista  : valores de c
         """
         try:
             return [
@@ -143,8 +140,8 @@ class SplineInterpolation:
             raise
 
     def __calc_d(self):
-        """ D calculation
-        :return list: c-values
+        """ calculo de d
+        :return list: valores de d
         """
         try:
             return self.ys
@@ -152,9 +149,9 @@ class SplineInterpolation:
             raise
 
     def __search_i(self, t):
-        """ Index searching
-        :param float t: t-value
-        :return  int i: index
+        """ procura um indice
+        :float t: valor para procura
+        :return  int i: indice
         """
         i, j = 0, len(self.xs) - 1
         try:
@@ -169,51 +166,3 @@ class SplineInterpolation:
             return i
         except Exception as e:
             raise
-
-class Graph:
-    def __init__(self, xs_0, ys_0, xs_1, ys_1):
-        self.xs_0, self.ys_0, self.xs_1, self.ys_1 = xs_0, ys_0, xs_1, ys_1
-
-    def plot(self):
-        """ Graph plotting """
-        try:
-            plt.title("3-D Spline Interpolation")
-            plt.scatter(
-                self.xs_1, self.ys_1, c = "b",
-                label = "interpolated points", marker = "+"
-            )
-            plt.scatter(
-                self.xs_0, self.ys_0, c = "r",
-                label = "given points"
-            )
-            plt.xlabel("x")
-            plt.ylabel("y")
-            plt.legend(loc = 2)
-            plt.grid(color = "gray", linestyle = "--")
-            #plt.show()
-            #plt.savefig("spline_interpolation.png")
-        except Exception as e:
-            raise
-
-"""
-if __name__ == '__main__':
-    # (N + 1) points
-    X = [0.0, 0.5, 1.0, 1.5, 2.0]
-    Y = [3.0, 1.8616, -0.5571, -4.1987, -9.0536]
-    S   = 0.1        # Step for interpolation
-    S_1 = 1 / S      # Inverse of S
-    xs_g, ys_g = [], []  # List for graph
-    try:
-        # 3-D spline interpolation
-        si = SplineInterpolation(X, Y)
-        for x in [x / S_1 for x in range(int(X[0] / S), int(X[-1] / S) + 1)]:
-            y = si.interpolate(x)
-            print("{:8.4f}, {:8.4f}".format(x, y))
-            xs_g.append(x)
-            ys_g.append(y)
-        # Graph drawing
-        g = Graph(X, Y, xs_g, ys_g)
-        g.plot()
-    except Exception as e:
-        traceback.print_exc()
-"""
